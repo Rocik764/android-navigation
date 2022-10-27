@@ -1,5 +1,10 @@
 package com.example.myapplication;
 
+/**
+ * klasa odpowiedzialna za wymodelowanie danych dla naszej listy, są tu wszystkie dane jakie były wymagane
+ * w zadaniu, czyli lat, long, dystans, kierunek, prędkość i jeszcze dodany czas pomiaru by było wiadomo
+ * które jest które itp.
+ */
 public class LocationModel {
     private double latitude;
     private double longitude;

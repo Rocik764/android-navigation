@@ -17,12 +17,27 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * główny widok aplikacji, z listą -> (res/layout) widoku w activity_main.xml
+ */
 public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private LocationAdapter locationAdapter;
     private ArrayList<LocationModel> locationModels;
 
+    /**
+     * najpierw wywołuje się ta metoda, w niej ustawiane są wszystkie potrzebne zmienne, głównie te powyżej:
+     *
+     * locationModels - array lista z modelem naszych pomiarów z gps, która przekazujemy do adaptera LocationAdapter
+     * adapter ten jest tylko takim jakby szkieletem dla ListView z danymi, on sam nie wyświetla danych tylko
+     * ustawia je w ListView locationListView
+     *
+     * locationManager - to manager lokalizacji, kod podany był w zadaniu odnośnie jego
+     *
+     * locationListener - prywatna klasa też podana w zadaniu w pliku co mi wysłałeś, ten listener służy za obsługę
+     * wydarzeń związanych z lokalizacją, czyli jak się coś tam zmienia to on zrobi jakąś czynność
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,12 +61,18 @@ public class MainActivity extends AppCompatActivity {
         registerListener();
     }
 
+    /**
+     * nadpisana metoda odpytująca użytkownika o zezwolenie na korzystanie z lokalizacji, user musi zezwolić by cokolwiek działało
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         registerListener();
     }
 
+    /**
+     * to też podane w zadaniu było, po prostu zarejestrowanie naszego listenera z tej prywatnej klasy w managerze lokalizacji
+     */
     private void registerListener() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -60,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
 
+    /**
+     * tutaj utworzony model z danymi dodajemy do array listy przekazanej do adaptera a potem informujemy adapter, że była zmiana w liście
+     * po prostu tutaj dodają się nowe dane z listenera lokalizacji a potem refreshuje się lista na widoku
+     * size >= 10 bo w zadaniu jest "ostatnie 10 lub więcej" dlatego usuwam pierwotny element i dodaje nowy więc lista się zmienia co chwilę
+     * ale wciąż nie ma więcej niż 10 elementów
+     */
     protected void updateLocationList(LocationModel locationModel) {
         if (locationModels.size() >= 10) {
             locationModels.remove(0);
@@ -69,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
         locationAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * prywatna klasa listenera podana w zadaniu, tutaj tylko onLocationChanged() i processLocation() są użyteczne ale nie można usunąć tych innych
+     * bo apka się wywala wtedy, tutaj tworzy się nasz model do array listy wyświetlanej na liście w widoku (kolejny element z danymi)
+     * dodałem czas pomiaru, lat, lon, prędkość, bearing (kierunek?) oraz dystans tak jak było wymagane w #3 zadania
+     */
     private class MyLocationListener implements LocationListener {
         Location prevLocation = null;
 
